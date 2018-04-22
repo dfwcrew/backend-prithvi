@@ -5,7 +5,7 @@ Features:
 
 ## Build
 
-`docker build -t "prithvi-app:dev" .`
+`docker build -t "prithvi-app:dev" .` 
 
 ## Run
 
