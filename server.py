@@ -109,4 +109,4 @@ def internal_error(error):
     return "Error 500: Administrator has been notified. Please try again in sometime", 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=port, debug=os.getenv(DEBUG))
+    app.run(host='0.0.0.0', port=port, debug=False)
