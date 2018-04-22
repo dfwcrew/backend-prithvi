@@ -1,11 +1,20 @@
-from flask import Flask, request
 import logging
 import os
 import json
 
+from flask import Flask, request
+from flask_cors import CORS, cross_origin
 import MySQLdb as mdb
+from flask_cache import Cache
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy dog'
+app.config['CORS_HEADERS'] = 'Content-Type'
+CORS(app)
+# cache = Cache(app,config={'CACHE_TYPE': 'simple'})
+
+logging.getLogger('flask_cors').level = logging.DEBUG
+
 
 # Read PORT available on cloud server
 port = int(os.environ.get('PORT', 8000))
@@ -22,10 +31,10 @@ class DecimalEncoder(json.JSONEncoder):
 
 def connect_database():
     try:
-        MYSQL_DATABASE_URI=""
-        MYSQL_DATABASE_USER=""
-        MYSQL_DATABASE_PASS=""
-        MYSQL_DATABASE_SCHEMA=""
+        MYSQL_DATABASE_URI="prithvidb.cqlgx6wqa58v.us-west-2.rds.amazonaws.com"
+        MYSQL_DATABASE_USER="dfwcrew"
+        MYSQL_DATABASE_PASS="HelloWorld"
+        MYSQL_DATABASE_SCHEMA="prithvidb"
         con = mdb.connect(MYSQL_DATABASE_URI, MYSQL_DATABASE_USER, \
                       MYSQL_DATABASE_PASS, MYSQL_DATABASE_SCHEMA, \
                       use_unicode=True, charset='utf8')
@@ -50,13 +59,14 @@ def index():
     return "Service status: Running</h3>Requests<h4>Received %s from %s at URL %s</h4><p>Requests served: %s" % (request.method, request.remote_addr, request.url, counter)
 
 @app.route('/events', methods=['GET','POST'])
+@cross_origin() # allow all origins all methods.
 def events():
     """Return disaster events from database"""
     is_empty = False
 
     con = connect_database()
 
-    sql_query = "SELECT * FROM prithvidb.disasters"
+    sql_query = "SELECT * FROM prithvidb.disastersFinal ORDER BY date"
 
     cursor = con.cursor()
     cursor.execute(sql_query)
